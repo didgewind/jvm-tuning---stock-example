@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- build.xml - buildfile servlets -->
+<project name="stocks" default="empaqueta" basedir=".">
+
+	<!-- Directorios -->
+	<property name="build.dir" value="build"/>
+	<property name="config.dir" value="config"/>
+	<property name="deploy.dir" value="/var/lib/tomcat8/webapps"/>
+<!--	<property name="deploy.dir" value="/home/made/EAP-6.1.0/jboss-eap-6.1/standalone/deployments"/>-->
+	<property name="file.name" value="stocks.war"/>
+	<property name="bin.dir" value="bin"/>
+	<property name="jsp.dir" value="jsp"/>
+	
+	<!-- Target para crear los directorios de destino -->
+	<target name="prepara">
+		<mkdir dir="${build.dir}/WEB-INF/classes"/>
+	</target>
+	
+	<target name="clean" description="Limpia todos los ficheros generados.">
+		<delete dir="${build.dir}"/>
+		<delete file="${deploy.dir}/${file.name}"/>
+		<delete file="${file.name}"/>
+		<mkdir dir="${build.dir}"/>
+	</target>
+	
+	<target name="copia" depends="prepara" description="Copia los archivos a su sitio">
+		<!-- APP WEB -->
+		<copy todir="${build.dir}/WEB-INF" file="${config.dir}/web.xml" />
+		<copy todir="${build.dir}/WEB-INF/lib">
+			<fileset dir="lib"/>
+		</copy>
+		<copy todir="${build.dir}">
+			<fileset dir="jsp"/>
+		</copy>
+<!--		<copy todir="${build.dir}">
+			<fileset dir="html"/>
+		</copy>-->
+		<copy todir="${build.dir}/WEB-INF/classes">
+			<fileset dir="${bin.dir}" />
+		</copy>
+	</target>
+	
+	<target name="empaqueta" depends="copia" description="Empaqueta todos los contenidos">
+		<jar jarfile="${file.name}" basedir="${build.dir}"/>
+		<copy todir="${deploy.dir}" file="${file.name}"/>
+	</target>
+	
+	<target name="all" depends="clean,empaqueta" description="limpia, copia y empaqueta"/>
+</project>
